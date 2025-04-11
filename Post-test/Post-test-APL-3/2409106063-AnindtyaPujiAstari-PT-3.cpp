@@ -124,7 +124,11 @@ string editReservasiUser(string nim)
     cout << "\nPilih Kelas Studio Baru:\n";
     cout << "1. Kelas A (Rp " << hargaPerJam[0] << "/jam)\n";
     cout << "2. Kelas B (Rp " << hargaPerJam[1] << "/jam)\n";
+<<<<<<< HEAD
     cout << "Pilih Kelas Studio (1/2): ";
+=======
+    cout << "Pilihan: ";
+>>>>>>> 8faaff2bb9b677cae1a79b36508dd898b8e3c547
     cin >> pilihan;
     if (pilihan < 1 || pilihan > 2) 
         return "Pilihan Tidak Valid!\n";
