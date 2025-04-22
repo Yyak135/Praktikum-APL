@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <string>
 using namespace std;
 
@@ -14,18 +15,18 @@ struct Reservasi
 {
     string nama;
     string nim;
-    Studio studio; 
+    Studio studio;
     int jam;
     int totalHarga;
 };
 
 string tampilkanDaftarStudio();
-string tampilkanDaftarStudio(Studio daftarStudio[], string alatMusik[][7]); 
+string tampilkanDaftarStudio(Studio *daftarStudio, string (*alatMusik)[7]);
 
 Reservasi daftarReservasi[MAX_RESERVASI];
 int jumlahReservasi = 0;
 
-Studio daftarStudio[2] = {{"Kelas A", 80000}, {"Kelas B", 100000}};
+Studio daftarStudio[2] = { {"Kelas A", 80000}, {"Kelas B", 100000} };
 string alatMusik[2][7] = 
 {
     {"Drum", "Keyboard", "Gitar Akustik", "Gitar Elektrik", "Bass", "Cajon", "Mic"},
@@ -37,77 +38,69 @@ string tampilkanDaftarStudio()
     return tampilkanDaftarStudio(daftarStudio, alatMusik);
 }
 
-string tampilkanDaftarStudio(Studio daftarStudio[], string alatMusik[][7]) 
+string tampilkanDaftarStudio(Studio *daftarStudio, string (*alatMusik)[7]) 
 {
     string output = "\n==================================================================================================\n";
     output += "| No | Kelas   | Alat Musik                                                      | Harga Per Jam |\n";
     output += "==================================================================================================\n";
-    for (int i = 0; i < 2; i++) 
-    {
-        output += "| " + to_string(i + 1) + "  | " + daftarStudio[i].namaKelas + " | ";
-        for (int j = 0; j < 7; j++) 
-        {
-            output += alatMusik[i][j];
+    for (int i = 0; i < 2; i++) {
+        output += "| " + to_string(i + 1) + "  | " + (*(daftarStudio + i)).namaKelas + " | ";
+        for (int j = 0; j < 7; j++) {
+            output += *(*(alatMusik + i) + j);
             if (j < 6) output += ", ";
         }
-        output += " | Rp " + to_string(daftarStudio[i].hargaPerJam) + "      |\n";
+        output += " | Rp " + to_string((*(daftarStudio + i)).hargaPerJam) + "      |\n";
     }
     output += "==================================================================================================\n";
     return output;
 }
 
-void tambahReservasiAwal(Reservasi daftarReservasi[], int &jumlah, Studio daftarStudio[]) 
+void tambahReservasiAwal(Reservasi *daftar, int *jumlah, Studio *daftarStudio) 
 {
-    daftarReservasi[jumlah++] = {"ipeh", "202101", daftarStudio[0], 3, 3 * daftarStudio[0].hargaPerJam};
-    daftarReservasi[jumlah++] = {"aryo", "202102", daftarStudio[1], 2, 2 * daftarStudio[1].hargaPerJam};
-    daftarReservasi[jumlah++] = {"araa", "202103", daftarStudio[0], 5, 5 * daftarStudio[0].hargaPerJam};
-    daftarReservasi[jumlah++] = {"inun", "202104", daftarStudio[1], 4, 4 * daftarStudio[1].hargaPerJam};
+    *(daftar + (*jumlah)++) = {"ipeh", "202101", *(daftarStudio), 3, 3 * daftarStudio[0].hargaPerJam};
+    *(daftar + (*jumlah)++) = {"aryo", "202102", *(daftarStudio + 1), 2, 2 * daftarStudio[1].hargaPerJam};
+    *(daftar + (*jumlah)++) = {"araa", "202103", *(daftarStudio), 5, 5 * daftarStudio[0].hargaPerJam};
+    *(daftar + (*jumlah)++) = {"inun", "202104", *(daftarStudio + 1), 4, 4 * daftarStudio[1].hargaPerJam};
 }
 
 void tampilkanReservasiUser(Reservasi daftarReservasi[], int jumlah, string nim, int i = 0, int no = 1, bool ada = false) 
 {
-    if (i == 0) 
-    {
+    if (i == 0) {
         cout << "\nReservasi Anda:\n";
         cout << "==========================================\n";
         cout << "| No | Kelas   | Jam | Total Harga       |\n";
         cout << "==========================================\n";
     }
 
-    if (i >= jumlah) 
-    {
+    if (i >= jumlah) {
         if (!ada) cout << "|          Tidak ada reservasi           |\n";
         cout << "==========================================\n";
         return;
     }
 
-    if (daftarReservasi[i].nim == nim) 
-    {
+    if (daftarReservasi[i].nim == nim) {
         cout << "| " << no << "  | " << daftarReservasi[i].studio.namaKelas
              << " |  " << daftarReservasi[i].jam
              << "  | Rp " << daftarReservasi[i].totalHarga << "         |\n";
         tampilkanReservasiUser(daftarReservasi, jumlah, nim, i + 1, no + 1, true);
-    } 
-    else 
-    {
+    } else {
         tampilkanReservasiUser(daftarReservasi, jumlah, nim, i + 1, no, ada);
     }
 }
 
-string registrasiUser(string &nama, string &nim) 
+string registrasiUser(string *nama, string *nim) 
 {
     cout << "\n--===REGISTRASI USER===--\nMasukkan Nama: ";
     cin.ignore();
-    getline(cin, nama);
+    getline(cin, *nama);
     cout << "Masukkan NIM: ";
-    getline(cin, nim);
+    getline(cin, *nim);
     return "Registrasi Berhasil!\n\n";
 }
 
-string tambahReservasiUser(string nama, string nim, Reservasi *daftar, int &jumlah, Studio daftarStudio[]) 
+string tambahReservasiUser(string nama, string nim, Reservasi *daftar, int *jumlah, Studio *daftarStudio) 
 {
-    if (jumlah >= MAX_RESERVASI)
-        return "Reservasi penuh! Tidak dapat menambah reservasi baru.\n";
+    if (*jumlah >= MAX_RESERVASI) return "Reservasi penuh!\n";
 
     Reservasi r;
     r.nama = nama;
@@ -118,10 +111,9 @@ string tambahReservasiUser(string nama, string nim, Reservasi *daftar, int &juml
     cout << "Pilih Kelas Studio (1/2): ";
     cin >> pilihan;
 
-    if (pilihan < 1 || pilihan > 2)
-        return "Pilihan tidak valid!\n";
+    if (pilihan < 1 || pilihan > 2) return "Pilihan tidak valid!\n";
 
-    r.studio = daftarStudio[pilihan - 1];
+    r.studio = *(daftarStudio + pilihan - 1);
     cout << "Masukkan jumlah jam: ";
     cin >> r.jam;
 
@@ -129,8 +121,7 @@ string tambahReservasiUser(string nama, string nim, Reservasi *daftar, int &juml
     int *hargaPtr = &r.studio.hargaPerJam;
     r.totalHarga = (*jamPtr) * (*hargaPtr);
 
-    daftar[jumlah++] = r;
-
+    *(daftar + (*jumlah)++) = r;
     return "Reservasi berhasil ditambahkan!\n";
 }
 
@@ -142,10 +133,8 @@ string editReservasiUser(string nim, Reservasi daftar[], int jumlah, Studio daft
     cout << "==========================================\n";
     cout << "| No | Kelas   | Jam | Total Harga       |\n";
     cout << "==========================================\n";
-    for (int i = 0; i < jumlah; i++) 
-    {
-        if (daftar[i].nim == nim) 
-        {
+    for (int i = 0; i < jumlah; i++) {
+        if (daftar[i].nim == nim) {
             urutan++;
             cout << "| " << urutan << "  | " << daftar[i].studio.namaKelas
                  << " |  " << daftar[i].jam
@@ -153,8 +142,7 @@ string editReservasiUser(string nim, Reservasi daftar[], int jumlah, Studio daft
         }
     }
 
-    if (urutan == 0) 
-    {
+    if (urutan == 0) {
         cout << "|          Tidak ada reservasi           |\n";
         cout << "==========================================\n";
         return "Tidak ada reservasi yang bisa diedit.\n";
@@ -167,13 +155,10 @@ string editReservasiUser(string nim, Reservasi daftar[], int jumlah, Studio daft
     cin >> no;
 
     urutan = 0;
-    for (int i = 0; i < jumlah; i++) 
-    {
-        if (daftar[i].nim == nim) 
-        {
+    for (int i = 0; i < jumlah; i++) {
+        if (daftar[i].nim == nim) {
             urutan++;
-            if (urutan == no) 
-            {
+            if (urutan == no) {
                 cout << "\nPilih Kelas Studio Baru:\n";
                 cout << "1. Kelas A (Rp " << daftarStudio[0].hargaPerJam << "/jam)\n";
                 cout << "2. Kelas B (Rp " << daftarStudio[1].hargaPerJam << "/jam)\n";
@@ -205,8 +190,7 @@ void tampilkanReservasiAdmin(Reservasi daftar[], int jumlah)
     cout << "| No | Nama                 | NIM       | Kelas   | Jam | Total Harga |\n";
     cout << "=======================================================================\n";
 
-    for (int i = 0; i < jumlah; i++) 
-    {
+    for (int i = 0; i < jumlah; i++) {
         cout << "| " << i + 1 << "  | " << daftar[i].nama;
         cout << string(21 - daftar[i].nama.length(), ' ') << "|  " << daftar[i].nim
              << "   | " << daftar[i].studio.namaKelas << " |  " << daftar[i].jam
@@ -242,8 +226,7 @@ bool loginAdmin()
 {
     string username, password;
     int kesempatan = 3;
-    while (kesempatan > 0) 
-    {
+    while (kesempatan > 0) {
         cout << "\n--===LOGIN ADMIN===--\nMasukkan Username: ";
         cin >> username;
         cout << "Masukkan Password: ";
@@ -261,82 +244,60 @@ int main()
     bool isAdmin = false;
     string namaUser, nimUser;
 
-    tambahReservasiAwal(daftarReservasi, jumlahReservasi, daftarStudio);
+    tambahReservasiAwal(daftarReservasi, &jumlahReservasi, daftarStudio);
 
-    while (true) 
-    {
+    while (true) {
         cout << "\n\nHELLO";
         cout << "\nSelamat Datang di Sistem Reservasi Studio Musik\n";
         cout << "1. Login Admin\n2. Registrasi User\n3. Keluar Program\nPilih: ";
         cin >> pilihan;
 
-        if (pilihan == 1) 
-        {
+        if (pilihan == 1) {
             isAdmin = loginAdmin();
             if (!isAdmin) {
                 cout << "Anda Telah Melebihi Batas Percobaan Login!\nPROGRAM BERHENTI.\n";
                 return 0;
             }
-        } 
-
-        else if (pilihan == 2) 
-        {
-            cout << registrasiUser(namaUser, nimUser);
+        } else if (pilihan == 2) {
+            cout << registrasiUser(&namaUser, &nimUser);
             isAdmin = false;
-        } 
-        else if (pilihan == 3) 
-        {
+        } else if (pilihan == 3) {
             cout << "\nTerima kasih telah menggunakan sistem ini.\n";
             return 0;
-        } 
-        else 
-        {
+        } else {
             cout << "\nPilihan Tidak Valid! Silakan coba lagi.\n\n";
             continue;
         }
 
-        while (true) 
-        {
+        while (true) {
             cout << "\nMENU:\n";
-            if (isAdmin) 
-            {
+            if (isAdmin) {
                 cout << "1. Lihat Semua Reservasi\n2. Hapus Reservasi\n3. Logout\n";
-            } 
-            else 
-            {
+            } else {
                 cout << "1. Lihat Daftar Studio Musik\n2. Tambah Reservasi\n3. Edit Reservasi\n4. Lihat Reservasi Saya\n5. Logout\n";
             }
 
             cout << "Pilih menu: ";
             cin >> pilihan;
 
-            if (isAdmin) 
-            {
+            if (isAdmin) {
                 if (pilihan == 1) tampilkanReservasiAdmin(daftarReservasi, jumlahReservasi);
                 else if (pilihan == 2) cout << hapusReservasiAdmin(daftarReservasi, jumlahReservasi);
-                else if (pilihan == 3) 
-                {
+                else if (pilihan == 3) {
                     cout << "\nAnda Berhasil Logout\n\n";
                     break;
-                } 
-                else 
-                {
+                } else {
                     cout << "\nPilihan Tidak Valid!\nSilakan coba lagi.\n\n";
                 }
-            } 
-            else 
-            {
+            } else {
                 if (pilihan == 1) cout << tampilkanDaftarStudio();
-                else if (pilihan == 2) cout << tambahReservasiUser(namaUser, nimUser, daftarReservasi, jumlahReservasi, daftarStudio);
+                else if (pilihan == 2) cout << tambahReservasiUser(namaUser, nimUser, daftarReservasi, &jumlahReservasi, daftarStudio);
                 else if (pilihan == 3) cout << editReservasiUser(nimUser, daftarReservasi, jumlahReservasi, daftarStudio);
                 else if (pilihan == 4) tampilkanReservasiUser(daftarReservasi, jumlahReservasi, nimUser);
-                else if (pilihan == 5) 
-                {
+                else if (pilihan == 5) {
                     cout << "\nAnda Berhasil Logout\n\n";
                     break;
-                } 
-                else 
-                {
+                } else {
                     cout << "\nPilihan Tidak Valid!\nSilakan coba lagi.\n\n";
                 }
             }
